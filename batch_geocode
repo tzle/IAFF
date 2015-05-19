@@ -1,0 +1,16 @@
+# usage: http://stackoverflow.com/questions/18456075/how-can-i-batch-geocode-street-addresses-from-a-csv-file-in-to-r
+# dat is the dataset
+# dat$full_address is the complete address
+
+#create a vector containing only the addresses
+adrs_vec <- with(dat,full_address)
+
+# create a vector for the results, load it with geocode results
+library(ggmap)
+gc_results <- geocode(adrs_vec)
+
+# merge results to original dataset
+dat_gc <- cbind(dat,gc_results)
+
+# quick map plot to check the data
+qmplot(lon,lat,data=dat_gc,color=I('red'),size=I(3),darken=0.3,source="osm")
