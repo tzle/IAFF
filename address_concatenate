@@ -1,5 +1,5 @@
 dat <- read.csv("the_input_file.csv",header=TRUE)
 names(dat)
 # assuming cols include: "address","city","state","zip"
-dat <- full_address <- do.call(paste,c(dat[c("address","city","state","zip")],sep=','))
+dat$full_address <- do.call(paste,c(dat[c("address","city","state","zip")],sep=','))
 dat$full_address
