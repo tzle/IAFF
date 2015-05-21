@@ -7,7 +7,7 @@ adrs_vec <- with(dat,full_address)
 
 # create a vector for the results, load it with geocode results
 library(ggmap)
-gc_results <- geocode(adrs_vec)
+gc_results <- geocode(adrs_vec) # geocode(as.character(adrs_vec))
 
 # merge results to original dataset
 dat_gc <- cbind(dat,gc_results)
