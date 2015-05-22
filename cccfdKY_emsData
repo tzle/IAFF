@@ -29,12 +29,29 @@ iaff2012$address <- paste(iaff2012$address,", United States",sep="")
 iaff2013$address <- paste(iaff2013$address,", United States",sep="")
 iaff2014$address <- paste(iaff2014$address,", United States",sep="")
 
+
 # CREATE TEMP DF TO ASSESS UNIQ COUNT
 iaff2012unq <- as.data.frame(unique(iaff2012$address)) # COUNT = 1145
 iaff2013unq <- as.data.frame(unique(iaff2013$address)) # COUNT = 1049
 iaff2014unq <- as.data.frame(unique(iaff2014$address)) # COUNT = 1079
 
+
+# STANDARDIZE COLUMN NAME
+colnames(iaff2012unq) <- c("address")
+colnames(iaff2013unq) <- c("address")
+colnames(iaff2014unq) <- c("address")
+
+
 # MERGE 3 UNIQUES, PURGE DUPLICATES INTO NEWDF
+tempdf <- rbind(iaff2012unq, iaff2013unq, iaff2014unq) # COUNT = 3273
+incloc2012_2014unq <- as.data.frame(unique(tempdf))    # COUNT = 3105
+
+# SUBSET TO 2000 RECORDS
+inclocunq_2000 <- as.data.frame(incloc2012_14unq[1:2000,])
+colnames(inclocunq_2000) <- c("address")
+
+# GEOCODE
+gc_results_2000 <- geocode(as.character(inclocunq_2000$address))
 
 
 # COUNT DUPLICATES
