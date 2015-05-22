@@ -1,7 +1,7 @@
 # LOAD SOURCE DATA
-iaff2012 <- read.csv("IAFFReport2012.csv",header=TRUE,skip=1)
-iaff2013 <- read.csv("IAFFReport2013.csv",header=TRUE,skip=1)
-iaff2014 <- read.csv("IAFFReport2014.csv",header=TRUE,skip=1)
+iaff2012 <- read.csv("IAFFReport2012.csv",header=TRUE,skip=1) # COUNT = 1483
+iaff2013 <- read.csv("IAFFReport2013.csv",header=TRUE,skip=1) # COUNT = 1413
+iaff2014 <- read.csv("IAFFReport2014.csv",header=TRUE,skip=1) # COUNT = 1426
 
 # REVIEW DATA STRUCTURE
 str(iaff2012) # 1483 x 7: Incident.Date, Incident.Number, Street.Number, Street.Name, City, ZIP.Code, Unit.Name
@@ -10,11 +10,33 @@ str(iaff2014) # 1426 x 7: ditto
 
 # BEFORE DOING A COUNT ON LOCATIONS, MERGE THE ADDRESS FIELD
 # --- 1st: street + city
-iaff2012$address <- do.call(paste,c(iaff2012[c("Street.Number","Street.Name","City")],sep=','))
+iaff2012$address <- do.call(paste,c(iaff2012[c("Street.Number","Street.Name","City")],sep=" "))
+iaff2013$address <- do.call(paste,c(iaff2013[c("Street.Number","Street.Name","City")],sep=" "))
+iaff2014$address <- do.call(paste,c(iaff2014[c("Street.Number","Street.Name","City")],sep=" "))
+
 # --- 2nd: append state "KY"
-iaff2012$address <- paste(iaff_2012$address,", KY,",sep="")
+iaff2012$address <- paste(iaff2012$address,", KY,",sep="")
+iaff2013$address <- paste(iaff2013$address,", KY,",sep="")
+iaff2014$address <- paste(iaff2014$address,", KY,",sep="")
+
 # --- 3rd: append zip code field
 iaff2012$address <- do.call(paste,c(iaff2012[c("address","ZIP.Code")],sep=""))
+iaff2013$address <- do.call(paste,c(iaff2013[c("address","ZIP.Code")],sep=""))
+iaff2014$address <- do.call(paste,c(iaff2014[c("address","ZIP.Code")],sep=""))
+
 # --- 4th: append "United States"
 iaff2012$address <- paste(iaff2012$address,", United States",sep="") 
+iaff2013$address <- paste(iaff2013$address,", United States",sep="")
+iaff2014$address <- paste(iaff2014$address,", United States",sep="")
+
+# CREATE TEMP DF TO ASSESS UNIQ COUNT
+iaff2012unq <- as.data.frame(unique(iaff2012$address)) # COUNT = 1145
+iaff2013unq <- as.data.frame(unique(iaff2013$address)) # COUNT = 1049
+iaff2014unq <- as.data.frame(unique(iaff2014$address)) # COUNT = 1079
+
+# MERGE 3 UNIQUES, PURGE DUPLICATES INTO NEWDF
+
+
+# COUNT DUPLICATES
+iaff_2012_df <- ddply(iaff_2012, .(address), transform, n= length(address))
 
