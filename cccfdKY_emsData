@@ -1,0 +1,20 @@
+# LOAD SOURCE DATA
+iaff2012 <- read.csv("IAFFReport2012.csv",header=TRUE,skip=1)
+iaff2013 <- read.csv("IAFFReport2013.csv",header=TRUE,skip=1)
+iaff2014 <- read.csv("IAFFReport2014.csv",header=TRUE,skip=1)
+
+# REVIEW DATA STRUCTURE
+str(iaff2012) # 1483 x 7: Incident.Date, Incident.Number, Street.Number, Street.Name, City, ZIP.Code, Unit.Name
+str(iaff2013) # 1413 x 7: ditto
+str(iaff2014) # 1426 x 7: ditto
+
+# BEFORE DOING A COUNT ON LOCATIONS, MERGE THE ADDRESS FIELD
+# --- 1st: street + city
+iaff2012$address <- do.call(paste,c(iaff2012[c("Street.Number","Street.Name","City")],sep=','))
+# --- 2nd: append state "KY"
+iaff2012$address <- paste(iaff_2012$address,", KY,",sep="")
+# --- 3rd: append zip code field
+iaff2012$address <- do.call(paste,c(iaff2012[c("address","ZIP.Code")],sep=""))
+# --- 4th: append "United States"
+iaff2012$address <- paste(iaff2012$address,", United States",sep="") 
+
