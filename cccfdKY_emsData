@@ -53,6 +53,12 @@ colnames(inclocunq_2000) <- c("address")
 # GEOCODE
 gc_results_2000 <- geocode(as.character(inclocunq_2000$address))
 
+# COMBINE WITH ADDRESS DF
+gc_inclocunq_2000 <- cbind(inclocunq_2000,gc_results_2000)
+
+# EXTRACT NEXT SET OF RECORDS
+inclocunq_2001_3105 <- as.data.frame(incloc2012_14unq[2001:3105,])
+colnames(inclocunq_2001_3105) <- c("address")
 
 # COUNT DUPLICATES
 iaff_2012_df <- ddply(iaff_2012, .(address), transform, n= length(address))
