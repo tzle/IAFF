@@ -9,25 +9,30 @@ str(iaff2013) # 1413 x 7: ditto
 str(iaff2014) # 1426 x 7: ditto
 
 # BEFORE DOING A COUNT ON LOCATIONS, MERGE THE ADDRESS FIELD
-# --- 1st: street + city
-iaff2012$address <- do.call(paste,c(iaff2012[c("Street.Number","Street.Name","City")],sep=" "))
-iaff2013$address <- do.call(paste,c(iaff2013[c("Street.Number","Street.Name","City")],sep=" "))
-iaff2014$address <- do.call(paste,c(iaff2014[c("Street.Number","Street.Name","City")],sep=" "))
+# --- 1st: street
+iaff2012$address <- do.call(paste,c(iaff2012[c("Street.Number","Street.Name")],sep=" "))
+iaff2013$address <- do.call(paste,c(iaff2013[c("Street.Number","Street.Name")],sep=" "))
+iaff2014$address <- do.call(paste,c(iaff2014[c("Street.Number","Street.Name")],sep=" "))
 
-# --- 2nd: append state "KY"
-iaff2012$address <- paste(iaff2012$address,", KY,",sep="")
-iaff2013$address <- paste(iaff2013$address,", KY,",sep="")
-iaff2014$address <- paste(iaff2014$address,", KY,",sep="")
+ # --- 2nd: address + city
+iaff2012$address <- do.call(paste,c(iaff2012[c("address","City")],sep=","))
+iaff2013$address <- do.call(paste,c(iaff2013[c("address","City")],sep=","))
+iaff2014$address <- do.call(paste,c(iaff2014[c("address","City")],sep=","))
+
+# --- 3rd: append state "KY"
+iaff2012$address <- paste(iaff2012$address,"KY",sep=",")
+iaff2013$address <- paste(iaff2013$address,"KY",sep=",")
+iaff2014$address <- paste(iaff2014$address,"KY",sep=",")
 
 # --- 3rd: append zip code field
-iaff2012$address <- do.call(paste,c(iaff2012[c("address","ZIP.Code")],sep=""))
-iaff2013$address <- do.call(paste,c(iaff2013[c("address","ZIP.Code")],sep=""))
-iaff2014$address <- do.call(paste,c(iaff2014[c("address","ZIP.Code")],sep=""))
+iaff2012$address <- do.call(paste,c(iaff2012[c("address","ZIP.Code")],sep=","))
+iaff2013$address <- do.call(paste,c(iaff2013[c("address","ZIP.Code")],sep=","))
+iaff2014$address <- do.call(paste,c(iaff2014[c("address","ZIP.Code")],sep=","))
 
 # --- 4th: append "United States"
-iaff2012$address <- paste(iaff2012$address,", United States",sep="") 
-iaff2013$address <- paste(iaff2013$address,", United States",sep="")
-iaff2014$address <- paste(iaff2014$address,", United States",sep="")
+iaff2012$address <- paste(iaff2012$address,"United States",sep=",") 
+iaff2013$address <- paste(iaff2013$address,"United States",sep=",")
+iaff2014$address <- paste(iaff2014$address,"United States",sep=",")
 
 
 # CREATE TEMP DF TO ASSESS UNIQ COUNT
@@ -35,31 +40,36 @@ iaff2012unq <- as.data.frame(unique(iaff2012$address)) # COUNT = 1145
 iaff2013unq <- as.data.frame(unique(iaff2013$address)) # COUNT = 1049
 iaff2014unq <- as.data.frame(unique(iaff2014$address)) # COUNT = 1079
 
-
 # STANDARDIZE COLUMN NAME
 colnames(iaff2012unq) <- c("address")
 colnames(iaff2013unq) <- c("address")
 colnames(iaff2014unq) <- c("address")
 
-
 # MERGE 3 UNIQUES, PURGE DUPLICATES INTO NEWDF
 tempdf <- rbind(iaff2012unq, iaff2013unq, iaff2014unq) # COUNT = 3273
 incloc2012_2014unq <- as.data.frame(unique(tempdf))    # COUNT = 3105
+incloc2012_2014unq$row.names <- NULL                   # remove unnecessary column
+rm(tempdf)
 
 # SUBSET TO 2000 RECORDS
-inclocunq_2000 <- as.data.frame(incloc2012_14unq[1:2000,])
+inclocunq_2000 <- as.data.frame(incloc2012_2014unq[1:2000,]) # COUNT = 2000
 colnames(inclocunq_2000) <- c("address")
+
+# SUBSET TO 2001 - 3105 RECORDS
+inclocunq_2001_3105 <- as.data.frame(incloc2012_2014unq[2001:3105,]) # COUNT = 1105
+colnames(inclocunq_2001_3105) <- c("address")
 
 # GEOCODE
 gc_results_2000 <- geocode(as.character(inclocunq_2000$address))
+gc_results_2001_3105 <- geocode(as.character(inclocunq_2001_3105$address))
 
 # COMBINE WITH ADDRESS DF
 gc_inclocunq_2000 <- cbind(inclocunq_2000,gc_results_2000)
+gc_inclocunq_2001_3105 <- cbind(inclocunq_2001_3105,gc_results_2001_3105)
 
-# EXTRACT NEXT SET OF RECORDS
-inclocunq_2001_3105 <- as.data.frame(incloc2012_14unq[2001:3105,])
-colnames(inclocunq_2001_3105) <- c("address")
 
-# COUNT DUPLICATES
+# MERGE DATASETS BY ADDRESS FIELD MATCH
+
+# ------ COUNT DUPLICATES
 iaff_2012_df <- ddply(iaff_2012, .(address), transform, n= length(address))
 
