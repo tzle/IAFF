@@ -1,0 +1,2 @@
+attach(dat)
+dat.date.frq <- as.data.frame(table(dat$datefield))
